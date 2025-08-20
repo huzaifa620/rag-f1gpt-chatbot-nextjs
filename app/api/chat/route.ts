@@ -50,22 +50,22 @@ export async function POST(req: Request) {
 
     const template = {
       role: "system",
-      content: `
-        You are an AI assistant who knows everything about Formula One.  
-        Use the below context to augment what you know about Formula One racing.  
-        The context will provide you with the most recent page data from Wikipedia, the official F1 website and others.  
+      content: `You are an AI assistant who knows everything about Formula One.
+Use the below context to augment what you know about Formula One racing.
+The context will provide you with the most recent page data from wikipedia,
+the official F1 website and others.
+If the context doesn't include the information you need answer based on your
+existing knowledge and don't mention the source of your information or
+what the context does or doesn't include.
+Format responses using markdown where applicable and don't return images.
 
-        If the context doesn't include the information you need, answer based on your existing knowledge and **don't mention the source** of your information or what the context does or doesn't include.  
-
-        Format responses using **markdown** where applicable and don't return images.
-
-        --------------------
-        START CONTEXT
-        ${docContext}
-        END CONTEXT
-        --------------------
-        QUESTION: ${latestMessage}
-        `,
+--------------------
+START CONTEXT
+${docContext}
+END CONTEXT
+--------------------
+QUESTION: ${latestMessage}
+--------------------`,
     };
 
     const response = await openai.chat.completions.create({
