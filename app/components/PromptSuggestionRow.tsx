@@ -1,6 +1,10 @@
 import PromptSuggestionButton from "./PromptSuggestionButton";
 
-const PromptSuggestionsRow = ({ onPromptClick }) => {
+const PromptSuggestionsRow = ({
+  onPromptClick,
+}: {
+  onPromptClick: (text: string) => void;
+}) => {
   const prompts = [
     "Who is head of racing for Aston Martin's F1 Academy team?",
     "Who is the highest paid F1 driver?",
@@ -9,7 +13,7 @@ const PromptSuggestionsRow = ({ onPromptClick }) => {
   ];
 
   return (
-    <div className="prompt-suggestion-row">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
       {prompts.map((prompt, index) => (
         <PromptSuggestionButton
           key={`suggestion-${index}`}
