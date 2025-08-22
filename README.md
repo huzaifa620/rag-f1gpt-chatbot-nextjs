@@ -78,16 +78,9 @@ ASTRA_DB_APPLICATION_TOKEN=AstraCS:********************************
 # AI/ML API
 AIML_API_KEY=********************************
 AIML_API_BASE=https://api.aimlapi.com/v1
-GPT5_MODEL=openai/gpt-5-2025-08-07
+GPT5_MODEL=openai/gpt-5-nano-2025-08-07
 EMBEDDING_MODEL=openai/text-embedding-3-small
 
-# Optional quality-of-life
-# NEXT_TELEMETRY_DISABLED=1
-# PORT=3000
-
-Tips:
-- For seeding only, `.env` is sufficient because `scripts/loadDB.ts` imports `dotenv/config`.
-- For the app/API route, use `.env.local` so Next.js picks it up.
 ```
 
 ---
@@ -147,7 +140,7 @@ scripts/
 ## ⚡ Configuration
 
 - **Embeddings model**: `openai/text-embedding-3-small` (1536 dims)
-- **Chat model**: `openai/gpt-5-2025-08-07` (AI/ML API)
+- **Chat model**: `openai/gpt-5-nano-2025-08-07` (AI/ML API)
 - **API base**: `https://api.aimlapi.com/v1` (override via `AIML_API_BASE`)
 - **Similarity metric**: `dot_product`
 - **Chunking**: Recursive splitter (size 512, overlap 100)
