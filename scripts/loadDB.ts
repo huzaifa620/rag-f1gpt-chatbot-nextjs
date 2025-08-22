@@ -15,7 +15,8 @@ const {
 } = process.env;
 
 const openai = new OpenAI({
-  apiKey: OPENAI_API_KEY,
+  apiKey: process.env.AIML_API_KEY!,
+  baseURL: process.env.AIML_API_BASE || 'https://api.aimlapi.com/v1',
 });
 
 const f1Data = [
@@ -74,7 +75,7 @@ const loadSampleData = async () => {
       );
 
       const embedding = await openai.embeddings.create({
-        model: "text-embedding-3-small",
+        model: process.env.EMBEDDING_MODEL || 'openai/text-embedding-3-small',
         input: chunk,
         encoding_format: "float",
       });

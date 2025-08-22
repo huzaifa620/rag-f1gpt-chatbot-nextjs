@@ -12,6 +12,7 @@ const {
 
 const openai = new OpenAI({
   apiKey: OPENAI_API_KEY,
+  baseURL: process.env.AIML_API_BASE || 'https://api.aimlapi.com/v1',
 });
 
 const client = new DataAPIClient(ASTRA_DB_APPLICATION_TOKEN!);
@@ -69,7 +70,7 @@ QUESTION: ${latestMessage}
     };
 
     const response = await openai.chat.completions.create({
-      model: "gpt-5-nano",
+      model: process.env.GPT5_MODEL || 'openai/gpt-5-2025-08-07',
       stream: true,
       messages: [template, ...messages],
     });
