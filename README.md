@@ -1,7 +1,11 @@
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
+
 # F1GPT — RAG Chatbot for Formula One (Next.js)
 
 F1GPT is a Retrieval-Augmented Generation (RAG) chatbot built with **Next.js 15** and the **Vercel AI SDK**.
 It scrapes and indexes Formula One sources into a vector database (**DataStax Astra DB**), retrieves the most relevant chunks for a user’s question, and streams answers from **GPT-5** via the **AI/ML API** — styled with a Formula One-themed UI.
+
+Built for Co-Creating with GPT-5 using AI/ML API.
 
 ⚡ Built for the **[Co-Creating with GPT-5 Hackathon](https://lablab.ai/event/co-creating-with-gpt-5)**.
 
@@ -62,7 +66,7 @@ It scrapes and indexes Formula One sources into a vector database (**DataStax As
 
 ## 🔑 Environment Variables
 
-Create a `.env.local` (for the app) and `.env` (for seeding).
+Create a `.env.local` (for the app) and `.env` (for seeding). The app (Next.js) reads from `.env.local`; the seed script uses `dotenv` which reads `.env` by default.
 
 ```ini
 # Astra DB
@@ -76,6 +80,14 @@ AIML_API_KEY=********************************
 AIML_API_BASE=https://api.aimlapi.com/v1
 GPT5_MODEL=openai/gpt-5-2025-08-07
 EMBEDDING_MODEL=openai/text-embedding-3-small
+
+# Optional quality-of-life
+# NEXT_TELEMETRY_DISABLED=1
+# PORT=3000
+
+Tips:
+- For seeding only, `.env` is sufficient because `scripts/loadDB.ts` imports `dotenv/config`.
+- For the app/API route, use `.env.local` so Next.js picks it up.
 ```
 
 ---
@@ -136,8 +148,21 @@ scripts/
 
 - **Embeddings model**: `openai/text-embedding-3-small` (1536 dims)
 - **Chat model**: `openai/gpt-5-2025-08-07` (AI/ML API)
+- **API base**: `https://api.aimlapi.com/v1` (override via `AIML_API_BASE`)
 - **Similarity metric**: `dot_product`
 - **Chunking**: Recursive splitter (size 512, overlap 100)
+
+## 🤖 Why GPT-5?
+
+Short version: fewer hallucinations under retrieved context and better long-context answers.
+
+In informal side-by-side checks on F1 queries using this RAG setup (10 retrieved chunks):
+
+- GPT-5 adhered more closely to retrieved facts, reducing speculative claims.
+- Multi-chunk synthesis was more consistent and specific.
+- With longer inputs (multi-turn + context >8k tokens), response quality degraded less vs. smaller/older models.
+
+Note: These observations are not a formal benchmark. Results depend on retrieval quality, prompt design, and model availability/cost.
 
 ## 📜 License
 

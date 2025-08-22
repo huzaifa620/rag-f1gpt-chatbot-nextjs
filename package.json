@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "seed": "tsx ./scripts/loadDB.ts",
+    "seed": "tsx -r dotenv/config ./scripts/loadDB.ts",
     "lint": "next lint"
   },
   "dependencies": {
