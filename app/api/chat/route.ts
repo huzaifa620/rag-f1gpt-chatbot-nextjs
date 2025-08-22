@@ -11,7 +11,7 @@ const {
 } = process.env;
 
 const openai = new OpenAI({
-  apiKey: OPENAI_API_KEY,
+  apiKey: process.env.AIML_API_KEY!,
   baseURL: process.env.AIML_API_BASE || 'https://api.aimlapi.com/v1',
 });
 
