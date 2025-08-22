@@ -1,4 +1,3 @@
-import OpenAI from "openai";
 import { OpenAIStream, StreamingTextResponse } from "ai";
 import { DataAPIClient } from "@datastax/astra-db-ts";
 
@@ -13,11 +12,6 @@ const {
   GPT5_MODEL,
 } = process.env;
 
-const openai = new OpenAI({
-  baseURL: AIML_API_BASE || "https://api.aimlapi.com/v1",
-  apiKey: AIML_API_KEY!,
-});
-
 const client = new DataAPIClient(ASTRA_DB_APPLICATION_TOKEN!);
 const db = client.db(ASTRA_DB_API_ENDPOINT, { keyspace: ASTRA_DB_NAMESPACE });
 
@@ -26,7 +20,6 @@ async function embedTextRaw(text: string): Promise<number[]> {
     /\/+$/,
     ""
   );
-
   const model = (EMBEDDING_MODEL || "text-embedding-3-small").trim();
 
   const res = await fetch(`${base}/embeddings`, {
@@ -48,9 +41,6 @@ async function embedTextRaw(text: string): Promise<number[]> {
   }
 
   const json = (await res.json()) as { data: { embedding: number[] }[] };
-  if (!json?.data?.[0]?.embedding) {
-    throw new Error("Embedding response missing data[0].embedding");
-  }
   return json.data[0].embedding;
 }
 
@@ -97,13 +87,27 @@ QUESTION: ${latestMessage}
 --------------------`,
     };
 
-    const response = await openai.chat.completions.create({
-      model: GPT5_MODEL || "openai/gpt-5-2025-08-07",
-      stream: true,
-      messages: [template, ...messages],
+    // ✅ raw POST for chat completions
+    const base = (AIML_API_BASE || "https://api.aimlapi.com/v1").replace(
+      /\/+$/,
+      ""
+    );
+    const model = (GPT5_MODEL || "openai/gpt-5-nano-2025-08-07").trim();
+
+    const completionRes = await fetch(`${base}/chat/completions`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${AIML_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model,
+        stream: true,
+        messages: [template, ...messages],
+      }),
     });
 
-    const stream = OpenAIStream(response);
+    const stream = OpenAIStream(completionRes.body!);
     return new StreamingTextResponse(stream);
   } catch (err) {
     console.error("Error:", err);
