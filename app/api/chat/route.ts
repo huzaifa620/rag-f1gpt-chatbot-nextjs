@@ -7,12 +7,15 @@ const {
   ASTRA_DB_COLLECTION,
   ASTRA_DB_API_ENDPOINT,
   ASTRA_DB_APPLICATION_TOKEN,
-  OPENAI_API_KEY,
+  AIML_API_KEY,
+  AIML_API_BASE,
+  EMBEDDING_MODEL,
+  GPT5_MODEL
 } = process.env;
 
 const openai = new OpenAI({
-  apiKey: process.env.AIML_API_KEY!,
-  baseURL: process.env.AIML_API_BASE || 'https://api.aimlapi.com/v1',
+  baseURL: AIML_API_BASE || 'https://api.aimlapi.com/v1',
+  apiKey: AIML_API_KEY!,
 });
 
 const client = new DataAPIClient(ASTRA_DB_APPLICATION_TOKEN!);
@@ -26,7 +29,7 @@ export async function POST(req: Request) {
     let docContext = "";
 
     const embedding = await openai.embeddings.create({
-      model: "text-embedding-3-small",
+      model: EMBEDDING_MODEL || 'text-embedding-3-small',
       input: latestMessage,
       encoding_format: "float",
     });
@@ -70,7 +73,7 @@ QUESTION: ${latestMessage}
     };
 
     const response = await openai.chat.completions.create({
-      model: process.env.GPT5_MODEL || 'openai/gpt-5-2025-08-07',
+      model: GPT5_MODEL || 'openai/gpt-5-2025-08-07',
       stream: true,
       messages: [template, ...messages],
     });
