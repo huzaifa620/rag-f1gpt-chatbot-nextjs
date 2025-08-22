@@ -1,11 +1,16 @@
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
+
 ## F1GPT — RAG Chatbot for Formula One (Next.js)
 
-F1GPT is a Retrieval-Augmented Generation (RAG) chatbot built with Next.js 15 and the Vercel AI SDK. It scrapes and indexes popular Formula One sources into a vector database (DataStax Astra DB), retrieves the most relevant chunks for a user’s question, and streams answers from OpenAI—styled with an F1-themed UI.
+F1GPT is a Retrieval-Augmented Generation (RAG) chatbot built with Next.js 15 and the Vercel AI SDK. It scrapes and indexes popular Formula One sources into a vector database (DataStax Astra DB), retrieves the most relevant chunks for a user’s question, and streams answers from GPT-5 via an OpenAI-compatible AI/ML API—styled with an F1-themed UI.
+
+Built for Co-Creating with GPT-5 using AI/ML API.
 
 ### Highlights
 
 - Modern Next.js App Router with streaming chat UI
-- RAG pipeline: Puppeteer scraping → chunking (LangChain) → OpenAI embeddings → Astra DB vector search
+- RAG pipeline: Puppeteer scraping → chunking (LangChain) → embeddings (AI/ML API) → Astra DB vector search
+- GPT-5 reasoning with streamed responses via AI/ML API
 - Serverless API route with token-safe server-side access
 - Tailwind CSS v4 styling
 - Dockerfile included for containerized dev runs
@@ -14,21 +19,21 @@ F1GPT is a Retrieval-Augmented Generation (RAG) chatbot built with Next.js 15 an
 
 - Next.js 15, React 19
 - Vercel AI SDK (`ai`) for streaming responses
-- OpenAI API (chat + `text-embedding-3-small` embeddings)
+- OpenAI-compatible AI/ML API (chat + `text-embedding-3-small` embeddings)
 - DataStax Astra DB Vector for storage and similarity search
 - LangChain text splitters, Puppeteer for web scraping
 - TypeScript, ESLint, Tailwind CSS v4
 
 ## How it works
 
-1. Seeding: `scripts/loadDB.ts` scrapes a curated list of F1 URLs with Puppeteer, removes HTML, splits text into overlapping chunks, generates embeddings via OpenAI, and writes documents into an Astra DB collection with a 1536-dimension vector.
+1. Seeding: `scripts/loadDB.ts` scrapes a curated list of F1 URLs with Puppeteer, removes HTML, splits text into overlapping chunks, generates embeddings via the AI/ML API, and writes documents into an Astra DB collection with a 1536-dimension vector.
 2. Querying: `app/api/chat/route.ts` embeds the latest user message, performs a vector search on Astra DB (top 10 by similarity), and injects the retrieved context into a system prompt.
 3. Answering: The API streams a chat completion back to the client using the Vercel AI SDK’s `OpenAIStream`.
 
 ## Prerequisites
 
 - Node.js 20+
-- OpenAI API Key
+- AI/ML API Key (OpenAI-compatible)
 - DataStax Astra DB (Serverless Vector) project with:
   - Application Token
   - API Endpoint (Data API)
@@ -43,21 +48,38 @@ Required variables:
 
 - `ASTRA_DB_NAMESPACE` — Astra DB keyspace/namespace
 - `ASTRA_DB_COLLECTION` — Collection to store vectors and text
-- `ASTRA_DB_API_ENDPOINT` — Data API endpoint (e.g., https://`<db-id>`-`<region>`.apps.astra.datastax.com)
+- `ASTRA_DB_API_ENDPOINT` — Data API endpoint (e.g., https://<db-id>-<region>.apps.astra.datastax.com)
 - `ASTRA_DB_APPLICATION_TOKEN` — Astra DB application token (starts with `AstraCS:`)
-- `OPENAI_API_KEY` — OpenAI API key
+- `AIML_API_KEY` — API key for your AI/ML API provider
+
+Optional (tuning/timeouts):
+- `AIML_API_BASE` — Base URL for the OpenAI-compatible AI/ML API (default: `https://api.aimlapi.com/v1`)
+- `EMBEDDING_MODEL` — Embeddings model id (default: `openai/text-embedding-3-small`)
+- `GPT5_MODEL` — Chat model id (default: `openai/gpt-5-2025-08-07`)
+- `NEXT_TELEMETRY_DISABLED` — Set to `1` to disable Next.js telemetry
+- `PORT` — Port for Next.js dev server (default 3000)
 
 Example `.env.local` (for the web app):
 
 ```ini
+# Astra DB
 ASTRA_DB_NAMESPACE=f1gpt
 ASTRA_DB_COLLECTION=f1gpt_docs
 ASTRA_DB_API_ENDPOINT=https://<your-db-id>-<region>.apps.astra.datastax.com
 ASTRA_DB_APPLICATION_TOKEN=AstraCS:********************************
-OPENAI_API_KEY=sk-********************************
+
+# AI/ML API
+AIML_API_KEY=********************************
+# AIML_API_BASE=https://api.aimlapi.com/v1
+# EMBEDDING_MODEL=openai/text-embedding-3-small
+# GPT5_MODEL=openai/gpt-5-2025-08-07
 ```
 
 If you run the seed script, also create a `.env` with the same values (or adjust how you load envs).
+
+Tips:
+- For seeding only, `.env` is sufficient because `scripts/loadDB.ts` imports `dotenv/config`.
+- For the app/API route, use `.env.local` so Next.js picks it up.
 
 ## Installation
 
@@ -120,8 +142,9 @@ scripts/
 
 ## Configuration knobs
 
-- Embeddings model: `text-embedding-3-small` (1536 dims). Change in `scripts/loadDB.ts` and `app/api/chat/route.ts` if needed.
-- Chat model: set in `app/api/chat/route.ts` (default: `gpt-5-nano` in code). Update to your preferred available OpenAI model.
+- Embeddings: default `openai/text-embedding-3-small` (1536 dims). Override via `EMBEDDING_MODEL`. Used in `scripts/loadDB.ts` and `app/api/chat/route.ts`.
+- Chat model: default `openai/gpt-5-2025-08-07`. Override via `GPT5_MODEL`.
+- API base: default `https://api.aimlapi.com/v1`. Override via `AIML_API_BASE`.
 - Similarity metric: default `dot_product`. Change in `createCollection` in `scripts/loadDB.ts`.
 - Chunking: `RecursiveCharacterTextSplitter` with size 512 and overlap 100.
 
