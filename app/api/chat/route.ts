@@ -74,7 +74,7 @@ QUESTION: ${latestMessage}
       messages: [template, ...messages],
     });
 
-    const stream = OpenAIStream(response);
+    const stream = OpenAIStream(response as any);
     return new StreamingTextResponse(stream);
   } catch (err) {
     console.log("Error:", err);

@@ -7,17 +7,20 @@ WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 
-# Copy package files
+# Copy package files first for caching
 COPY package.json package-lock.json* ./
 
-# Force install deps (ignores peer conflicts)
+# Install dependencies
 RUN npm install --force
 
-# Copy the rest of the code
+# Copy the rest of the source code
 COPY . .
 
-# Expose port
+# Build Next.js app
+RUN npm run build
+
+# Expose app port
 EXPOSE 3000
 
-# Run in dev mode
-CMD ["npm", "run", "dev"]
+# Run optimized Next.js server
+CMD ["npm", "run", "start"]

@@ -7,7 +7,7 @@ import { Message } from "ai";
 import PromptSuggestionRow from "./components/PromptSuggestionRow";
 import LoadingBubble from "./components/LoadingBubble";
 import Bubble from "./components/Bubble";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 const Home = () => {
   const {
@@ -20,7 +20,6 @@ const Home = () => {
   } = useChat({});
   const noMessages = !messages || messages.length === 0;
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [isScrolled, setIsScrolled] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -29,11 +28,6 @@ const Home = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isLoading]);
-
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const { scrollTop } = e.currentTarget;
-    setIsScrolled(scrollTop > 0);
-  };
 
   const handlePrompt = (promptText: string) => {
     const msg: Message = {
@@ -85,9 +79,8 @@ const Home = () => {
               "w-full transition-all duration-300 rounded-xl",
               noMessages
                 ? "min-h-[200px]"
-                : "flex flex-col justify-end overflow-y-auto max-h-[60vh] bg-gray-900/30 p-4 border border-gray-700/50",
+                : "h-[60vh] overflow-y-auto bg-gray-900/30 p-4 border border-gray-700/50",
             ].join(" ")}
-            onScroll={handleScroll}
           >
             {noMessages ? (
               <div className="flex flex-col items-center justify-center h-full">
